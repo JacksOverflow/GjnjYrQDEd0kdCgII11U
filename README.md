@@ -15,3 +15,5 @@ mvn spring-boot:run
 or 
 
 run SensorApiApplication from the file
+
+open: http://localhost:8080
