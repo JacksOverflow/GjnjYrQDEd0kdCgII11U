@@ -25,7 +25,7 @@ go to -- http://localhost:8080/h2-console
 
 change url to (if not already) -- jdbc:h2:file:./data/sensordb
 
-query with: 'SELECT * FROM SENSOR_READINGS'
+query with: 'SELECT * FROM SENSOR_READING'
 ```
 
 ## Notes
