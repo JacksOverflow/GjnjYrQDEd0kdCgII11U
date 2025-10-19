@@ -124,6 +124,26 @@ class SensorServiceTest {
         assertEquals("No readings found", result.get("message"));
     }
 
-    // TODO: test date range filtering
+    @Test
+    void testQueryWithMultipleDays() {
+        // Add readings over multiple days
+        Instant now = Instant.now();
+        Instant twoDaysAgo = now.minusSeconds(2 * 86400L);
+        Instant weekAgo = now.minusSeconds(7 * 86400L);
+
+        sensorService.addReading(new SensorReading("sensor-1", "temperature", 25.0, now));
+        sensorService.addReading(new SensorReading("sensor-1", "temperature", 20.0, twoDaysAgo));
+        sensorService.addReading(new SensorReading("sensor-1", "temperature", 15.0, weekAgo));
+
+        // Query last 7 days - should get all 3
+        Map<String, Object> result = sensorService.queryAggregate("sensor-1", "temperature", "avg", 8);
+        assertEquals(3, result.get("count"));
+
+        // Query last 1 day - should only get recent one
+        result = sensorService.queryAggregate("sensor-1", "temperature", "avg", 1);
+        assertEquals(1, result.get("count"));
+    }
+
     // TODO: test querying across all sensors (null sensorId)
+    // TODO: negative test cases
 }

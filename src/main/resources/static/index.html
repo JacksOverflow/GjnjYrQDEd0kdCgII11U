@@ -127,13 +127,13 @@
            pattern="[a-zA-Z0-9\-_]*"
            maxlength="20"/>
 
-    <label for="queryMetric">
-        Metric <span class="hint">(optional - leave blank for all metrics)</span>
-    </label>
-    <input id="queryMetric"
-           type="text"
-           pattern="[a-z_]*"
-           maxlength="30"/>
+    <label for="queryMetric">Metric:</label>
+    <select id="queryMetric">
+        <option value="">All Metrics</option>
+        <option value="temperature">Temperature</option>
+        <option value="humidity">Humidity</option>
+        <option value="pressure">Pressure</option>
+    </select>
 
     <label for="statistic">Statistic:</label>
     <select id="statistic">
@@ -164,7 +164,6 @@
         let isValid = true;
 
         const sensorId = document.getElementById('sensorId').value.trim();
-        const metric = document.getElementById('metric').value.trim();
         const value = parseFloat(document.getElementById('value').value);
 
         // Reset error messages
@@ -175,13 +174,8 @@
             isValid = false;
         }
 
-        if (!metric || metric.length > 30) {
-            document.getElementById('metricError').classList.add('show');
-            isValid = false;
-        }
-
         if (isNaN(value) || value < -100 || value > 200) {
-            document.getElementById('valueError').textContent = 'Value must be a number between -100 and 200';
+            document.getElementById('valueError').textContent = 'Value must be between -100 and 200';
             document.getElementById('valueError').classList.add('show');
             isValid = false;
         }
@@ -197,7 +191,7 @@
 
         const reading = {
             sensorId: document.getElementById('sensorId').value.trim(),
-            metric: document.getElementById('metric').value.trim().toLowerCase(),
+            metric: document.getElementById('metric').value,
             value: parseFloat(document.getElementById('value').value),
             timestamp: new Date().toISOString()
         };
@@ -240,7 +234,7 @@
         }
 
         if (sensorId) params.append("sensorId", sensorId);
-        if (metric) params.append("metric", metric.toLowerCase());
+        if (metric) params.append("metric", metric);
         if (stat) params.append("statistic", stat);
         if (days) params.append("days", days);
 
@@ -261,13 +255,9 @@
         }
     }
 
-    // Optional: Clear error messages when user starts typing
+    // Clear error messages when user starts typing
     document.getElementById('sensorId').addEventListener('input', function() {
         document.getElementById('sensorIdError').classList.remove('show');
-    });
-
-    document.getElementById('metric').addEventListener('input', function() {
-        document.getElementById('metricError').classList.remove('show');
     });
 
     document.getElementById('value').addEventListener('input', function() {

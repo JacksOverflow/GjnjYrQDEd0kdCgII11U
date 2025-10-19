@@ -8,13 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 
-/*
-    Defines REST endpoint for adding sensor readings
-    Expose API and translate HTTP to service calls.
- */
-
+// REST API for sensor readings
 @RestController
 @RequestMapping("/api/sensors")
 @CrossOrigin(origins = "*")
@@ -53,7 +50,17 @@ public class SensorController {
             @RequestParam(defaultValue = "avg") String statistic,
             @RequestParam(required = false) Integer days){
 
+        // Validation
         int daysBack = (days == null || days < 1) ? 1 : days;
+        if (daysBack > 31) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Days must be between 1 and 31"));
+        }
+
+        if (!List.of("avg", "min", "max", "sum").contains(statistic.toLowerCase())) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Invalid statistic. Use: avg, min, max, or sum"));
+        }
 
         var result = sensorService.queryAggregate(sensorId, metric, statistic, daysBack);
         return ResponseEntity.ok(result);

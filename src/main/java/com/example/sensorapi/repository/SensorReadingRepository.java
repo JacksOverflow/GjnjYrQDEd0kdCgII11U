@@ -17,23 +17,4 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     List<SensorReading> findByMetricAndTimestampBetween( String metric, Instant from, Instant to);
     List<SensorReading> findByTimestampBetween(Instant from, Instant to);
 
-    @Query(value = """
-        SELECT sensor_id, metric,
-            CASE WHEN :statistic = 'min' THEN MIN(value)
-                WHEN :statistic = 'max' THEN MAX(value)
-                WHEN :statistic = 'sum' THEN SUM(value)
-                ELSE AVG(value) END as agg_value
-        FROM sensor_reading
-        WHERE timestamp BETWEEN :from AND :to
-            AND metric IN :metrics
-            AND (:useAllSensors = TRUE or sensor_id IN :sensorIds)
-        GROUP BY sensor_id, metric
-        """, nativeQuery = true)
-    List<Object[]> aggregate(
-            @Param("metrics") List<String> metrics,
-            @Param("statistics") String statistics,
-            @Param("from") Instant from,
-            @Param("to") Instant to,
-            @Param("useAllSensors") boolean useAllSensors,
-            @Param("sensorIds") List<String> sensorIds);
 }

@@ -13,6 +13,12 @@ run SensorApiApplication
 
 Then hit http://localhost:8080
 
+**Query Parameters:**
+- `sensorId` (optional): Filter by specific sensor or leave blank for all
+- `metric` (optional): temperature, humidity, or pressure (or blank for all)
+- `statistic` (optional): avg (default), min, max, sum
+- `days` (optional): Days to look back, **1-31 days** (default: 1)
+
 ## Notes
 - Using H2 in-memory DB for now (data doesn't persist between restarts)
 - Frontend is pretty basic but functional
