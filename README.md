@@ -20,7 +20,7 @@ Then hit http://localhost:8080
 - `days` (optional): Days to look back, **1-31 days** (default: 1)
 
 ## Notes
-- Using H2 in-memory DB for now (data doesn't persist between restarts)
+- Using H2 in-memory DB for now (data persists, but only per machine)
 - Frontend is pretty basic but functional
 - Query API lets you get min/max/avg/sum over time ranges
 
