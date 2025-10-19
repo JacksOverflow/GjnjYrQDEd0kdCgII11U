@@ -28,3 +28,4 @@ Then hit http://localhost:8080
 - Maybe add some scheduled tasks to generate fake data
 - Extend test coverage to Repository/recency
 - Migrate to DTO-usage to be able to update DB without breaking APIs
+- Negative value validation (i.e. negative humidity)
