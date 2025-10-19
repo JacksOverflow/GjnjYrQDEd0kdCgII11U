@@ -1,6 +1,10 @@
-package com.example.sensorapi.model;
+package com.example.sensorapi.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 import java.time.Instant;
 
 @Entity
@@ -10,10 +14,14 @@ public class SensorReading {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "sensor_id", nullable = false)
+    @Column(name = "sensor_id", nullable = false, length = 20)
+    @NotBlank(message = "Sensor ID is required")
+    @Size(max = 20, message = "Sensor ID too long")
     private String sensorId;
 
-    @Column(name = "metric", nullable = false)
+    @Column(name = "metric", nullable = false, length = 30)
+    @NotBlank(message = "Metric is required")
+    @Pattern(regexp = "[a-z_]+", message = "Metric must be lowercase letters and underscores")
     private String metric;
 
     @Column(name = "reading_value", nullable = false)

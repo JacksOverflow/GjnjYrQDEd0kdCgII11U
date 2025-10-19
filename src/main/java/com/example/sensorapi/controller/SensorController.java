@@ -1,7 +1,8 @@
 package com.example.sensorapi.controller;
 
-import com.example.sensorapi.model.SensorReading;
+import com.example.sensorapi.entity.SensorReading;
 import com.example.sensorapi.service.SensorService;
+import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,7 @@ public class SensorController {
     @PostMapping("/{sensorId}/readings")
     public ResponseEntity<SensorReading> addReading(
             @PathVariable String sensorId,
-            @RequestBody SensorReading reading) {
+            @Valid @RequestBody SensorReading reading) {
 
         reading.setSensorId(sensorId);
 

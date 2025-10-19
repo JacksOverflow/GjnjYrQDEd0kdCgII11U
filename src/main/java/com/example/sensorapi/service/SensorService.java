@@ -1,6 +1,6 @@
 package com.example.sensorapi.service;
 
-import com.example.sensorapi.model.SensorReading;
+import com.example.sensorapi.entity.SensorReading;
 import com.example.sensorapi.repository.SensorReadingRepository;
 import org.springframework.stereotype.Service;
 
