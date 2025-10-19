@@ -2,15 +2,10 @@ package com.example.sensorapi.service;
 
 import com.example.sensorapi.model.SensorReading;
 import com.example.sensorapi.repository.SensorReadingRepository;
-import com.example.sensorapi.web.dto.*;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
 import java.util.*;
-
-/*
-    Handles all general logic - saving readings and aggregating results
-*/
 
 @Service
 public class SensorService {
@@ -53,12 +48,16 @@ public class SensorService {
         switch (statistic.toLowerCase()) {
             case "min":
                 result = readings.stream().mapToDouble(SensorReading::getValue).min().orElse(Double.NaN);
+                break;
             case "max":
                 result = readings.stream().mapToDouble(SensorReading::getValue).max().orElse(Double.NaN);
+                break;
             case "sum":
                 result = readings.stream().mapToDouble(SensorReading::getValue).sum();
+                break;
             default:
                 result = readings.stream().mapToDouble(SensorReading::getValue).average().orElse(Double.NaN);
+                break;
         }
 
         Map<String, Object> response = new LinkedHashMap<>();

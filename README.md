@@ -1,19 +1,23 @@
 # API Weather Service
 
-A simple Spring Boot + Maven application for simulating weather sensor data.
+Quick Spring Boot app I threw together for tracking sensor data.
 
-### Features
-- Add sensor readings (temperature, humidity, etc.)
-- Query average, min, max, and sum by date range
-- In-memory H2 database
-- Simple HTML frontend
-
-### Run locally
+## Running it
 ```bash
 mvn spring-boot:run
 
 or 
 
-run SensorApiApplication from the file
+run SensorApiApplication
+```
 
-open: http://localhost:8080
+Then hit http://localhost:8080
+
+## Notes
+- Using H2 in-memory DB for now (data doesn't persist between restarts)
+- Frontend is pretty basic but functional
+- Query API lets you get min/max/avg/sum over time ranges
+
+## TODO
+- Add proper validation
+- Maybe add some scheduled tasks to generate fake data

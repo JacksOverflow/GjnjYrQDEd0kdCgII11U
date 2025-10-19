@@ -30,6 +30,9 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        input:invalid {
+            border-color: #dc3545;
+        }
         button {
             margin-top: 10px;
             padding: 10px 16px;
@@ -43,12 +46,30 @@
         button:hover {
             background-color: #0056b3;
         }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
         pre {
             background: #222;
             color: #0f0;
             padding: 10px;
             border-radius: 8px;
             overflow-x: auto;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .hint {
+            color: #6c757d;
+            font-size: 12px;
+            font-weight: normal;
         }
     </style>
 </head>
@@ -58,14 +79,36 @@
 
 <section>
     <h2>Add Sensor Reading</h2>
-    <label for="sensorId">Sensor ID:</label>
-    <input id="sensorId" type="text" value="1"/>
+
+    <label for="sensorId">
+        Sensor ID: <span class="hint">(alphanumeric, max 20 chars)</span>
+    </label>
+    <input id="sensorId"
+           type="text"
+           value="sensor-1"
+           required
+           pattern="[a-zA-Z0-9\-_]+"
+           maxlength="20"
+           title="Use only letters, numbers, hyphens, and underscores"/>
+    <div id="sensorIdError" class="error">Sensor ID is required</div>
 
     <label for="metric">Metric:</label>
-    <input id="metric" type="text" value="temperature"/>
+    <select id="metric">
+        <option value="temperature">Temperature (°C)</option>
+        <option value="humidity">Humidity (%)</option>
+        <option value="pressure">Pressure (kPa)</option>
+    </select>
 
     <label for="value">Value:</label>
-    <input id="value" type="number" step="0.01" value="25.5"/>
+    <input id="value"
+           type="number"
+           step="0.01"
+           value="25.5"
+           required
+           min="-100"
+           max="200"
+           title="Value must be between -100 and 200"/>
+    <div id="valueError" class="error">Value must be between -100 and 200</div>
 
     <button onclick="addReading()">Add Reading</button>
 
@@ -75,11 +118,22 @@
 
 <section>
     <h2>Query Sensor Data</h2>
-    <label for="querySensorId">Sensor ID (or blank for all):</label>
-    <input id="querySensorId" type="text" />
 
-    <label for="queryMetric">Metric (e.g., temperature, humidity):</label>
-    <input id="queryMetric" type="text" />
+    <label for="querySensorId">
+        Sensor ID <span class="hint">(optional - leave blank for all sensors)</span>
+    </label>
+    <input id="querySensorId"
+           type="text"
+           pattern="[a-zA-Z0-9\-_]*"
+           maxlength="20"/>
+
+    <label for="queryMetric">
+        Metric <span class="hint">(optional - leave blank for all metrics)</span>
+    </label>
+    <input id="queryMetric"
+           type="text"
+           pattern="[a-z_]*"
+           maxlength="30"/>
 
     <label for="statistic">Statistic:</label>
     <select id="statistic">
@@ -89,8 +143,14 @@
         <option value="sum">Sum</option>
     </select>
 
-    <label for="days">Days Back (optional):</label>
-    <input id="days" type="number" placeholder="e.g. 7"/>
+    <label for="days">Days Back:</label>
+    <input id="days"
+           type="number"
+           placeholder="1"
+           min="1"
+           max="31"
+           title="Must be between 1 and 31 days"/>
+    <div id="daysError" class="error">Days must be between 1 and 31</div>
 
     <button onclick="queryReadings()">Run Query</button>
 
@@ -99,10 +159,45 @@
 </section>
 
 <script>
+    // Basic validation for add reading form
+    function validateAddForm() {
+        let isValid = true;
+
+        const sensorId = document.getElementById('sensorId').value.trim();
+        const metric = document.getElementById('metric').value.trim();
+        const value = parseFloat(document.getElementById('value').value);
+
+        // Reset error messages
+        document.querySelectorAll('.error').forEach(e => e.classList.remove('show'));
+
+        if (!sensorId || sensorId.length > 20) {
+            document.getElementById('sensorIdError').classList.add('show');
+            isValid = false;
+        }
+
+        if (!metric || metric.length > 30) {
+            document.getElementById('metricError').classList.add('show');
+            isValid = false;
+        }
+
+        if (isNaN(value) || value < -100 || value > 200) {
+            document.getElementById('valueError').textContent = 'Value must be a number between -100 and 200';
+            document.getElementById('valueError').classList.add('show');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
     async function addReading() {
+        if (!validateAddForm()) {
+            document.getElementById('addResponse').textContent = 'Please fix validation errors above';
+            return;
+        }
+
         const reading = {
-            sensorId: document.getElementById('sensorId').value,
-            metric: document.getElementById('metric').value,
+            sensorId: document.getElementById('sensorId').value.trim(),
+            metric: document.getElementById('metric').value.trim().toLowerCase(),
             value: parseFloat(document.getElementById('value').value),
             timestamp: new Date().toISOString()
         };
@@ -113,33 +208,75 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reading)
             });
+
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+
             const data = await res.json();
             document.getElementById('addResponse').textContent = JSON.stringify(data, null, 2);
+            document.getElementById('addResponse').style.color = '#0f0';
         } catch (err) {
-            document.getElementById('addResponse').textContent = err;
+            console.error('Error adding reading:', err);
+            document.getElementById('addResponse').textContent = 'Error: ' + err.message;
+            document.getElementById('addResponse').style.color = '#f00';
         }
     }
 
     async function queryReadings() {
         const params = new URLSearchParams();
-        const sensorId = document.getElementById('querySensorId').value;
-        const metric = document.getElementById('queryMetric').value;
+        const sensorId = document.getElementById('querySensorId').value.trim();
+        const metric = document.getElementById('queryMetric').value.trim();
         const stat = document.getElementById('statistic').value;
         const days = document.getElementById('days').value;
 
+        // Simple validation for days
+        if (days && (parseInt(days) < 1 || parseInt(days) > 31)) {
+            document.getElementById('daysError').classList.add('show');
+            document.getElementById('queryResponse').textContent = 'Days must be between 1 and 31';
+            return;
+        } else {
+            document.getElementById('daysError').classList.remove('show');
+        }
+
         if (sensorId) params.append("sensorId", sensorId);
-        if (metric) params.append("metric", metric);
+        if (metric) params.append("metric", metric.toLowerCase());
         if (stat) params.append("statistic", stat);
         if (days) params.append("days", days);
 
         try {
             const res = await fetch(`/api/sensors/query?${params.toString()}`);
+
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+
             const data = await res.json();
             document.getElementById('queryResponse').textContent = JSON.stringify(data, null, 2);
+            document.getElementById('queryResponse').style.color = '#0f0';
         } catch (err) {
-            document.getElementById('queryResponse').textContent = err;
+            console.error('Query error:', err);
+            document.getElementById('queryResponse').textContent = 'Error: ' + err.message;
+            document.getElementById('queryResponse').style.color = '#f00';
         }
     }
+
+    // Optional: Clear error messages when user starts typing
+    document.getElementById('sensorId').addEventListener('input', function() {
+        document.getElementById('sensorIdError').classList.remove('show');
+    });
+
+    document.getElementById('metric').addEventListener('input', function() {
+        document.getElementById('metricError').classList.remove('show');
+    });
+
+    document.getElementById('value').addEventListener('input', function() {
+        document.getElementById('valueError').classList.remove('show');
+    });
+
+    document.getElementById('days').addEventListener('input', function() {
+        document.getElementById('daysError').classList.remove('show');
+    });
 </script>
 
 </body>

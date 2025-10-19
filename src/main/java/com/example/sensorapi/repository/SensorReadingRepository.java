@@ -8,34 +8,14 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 
-
-/*
-    Provides CRUD and query methods for SensorReading objects.
-    JpaRepository for save, find, delete, etc..
-
- */
-
 @Repository
 public interface SensorReadingRepository extends JpaRepository<SensorReading, Long> {
 
-    List<SensorReading> findBySensorId(
-            String sensorId);
-    List<SensorReading> findBySensorIdAndMetricAndTimestampBetween(
-            String sensorId,
-            String metric,
-            Instant from,
-            Instant to);
-    List<SensorReading> findBySensorIdAndTimestampBetween(
-            String sensorId,
-            Instant from,
-            Instant to);
-    List<SensorReading> findByMetricAndTimestampBetween(
-            String metric,
-            Instant from,
-            Instant to);
-    List<SensorReading> findByTimestampBetween(
-            Instant from,
-            Instant to);
+    List<SensorReading> findBySensorId(String sensorId);
+    List<SensorReading> findBySensorIdAndMetricAndTimestampBetween( String sensorId, String metric, Instant from, Instant to);
+    List<SensorReading> findBySensorIdAndTimestampBetween( String sensorId, Instant from, Instant to);
+    List<SensorReading> findByMetricAndTimestampBetween( String metric, Instant from, Instant to);
+    List<SensorReading> findByTimestampBetween(Instant from, Instant to);
 
     @Query(value = """
         SELECT sensor_id, metric,

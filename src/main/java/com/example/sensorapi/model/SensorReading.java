@@ -2,12 +2,6 @@ package com.example.sensorapi.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.*;
-
-
-/*
-    Map one reading (temp, humidity, etc.) to JPA database table: sensor_reading.
- */
 
 @Entity
 @Table(name = "sensor_reading")
@@ -37,7 +31,6 @@ public class SensorReading {
         this.timestamp = timestamp;
     }
 
-    //Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

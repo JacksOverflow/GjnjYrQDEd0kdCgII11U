@@ -2,12 +2,10 @@ package com.example.sensorapi.controller;
 
 import com.example.sensorapi.model.SensorReading;
 import com.example.sensorapi.service.SensorService;
-import com.example.sensorapi.web.dto.ReadingDto;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -32,10 +30,8 @@ public class SensorController {
             @PathVariable String sensorId,
             @RequestBody SensorReading reading) {
 
-        // set sensorId from path so it’s always consistent
         reading.setSensorId(sensorId);
 
-        // if no timestamp provided, fill it
         if (reading.getTimestamp() == null) {
             reading.setTimestamp(Instant.now());
         }
@@ -56,7 +52,6 @@ public class SensorController {
             @RequestParam(defaultValue = "avg") String statistic,
             @RequestParam(required = false) Integer days){
 
-        // Default to 1 day if not provided
         int daysBack = (days == null || days < 1) ? 1 : days;
 
         var result = sensorService.queryAggregate(sensorId, metric, statistic, daysBack);
