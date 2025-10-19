@@ -19,6 +19,15 @@ Then hit http://localhost:8080
 - `statistic` (optional): avg (default), min, max, sum
 - `days` (optional): Days to look back, **1-31 days** (default: 1)
 
+To check stored data:
+```
+go to -- http://localhost:8080/h2-console
+
+change url to (if not already) -- jdbc:h2:file:./data/sensordb
+
+query with: 'SELECT * FROM SENSOR_READINGS'
+```
+
 ## Notes
 - Using H2 in-memory DB for now (data persists, but only per machine)
 - Frontend is pretty basic but functional
