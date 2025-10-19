@@ -2,7 +2,6 @@ package com.example.sensorapi.repository;
 
 import com.example.sensorapi.entity.SensorReading;
 import org.springframework.data.jpa.repository.*;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
